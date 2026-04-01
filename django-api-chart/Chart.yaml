@@ -1,0 +1,6 @@
+apiVersion: v2
+name: django-api-chart
+description: Django REST API with PostgreSQL for k3s homelab
+type: application
+version: 0.1.0
+appVersion: "1.0.1"

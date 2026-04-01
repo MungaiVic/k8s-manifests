@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-api
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.django.replicas }}
+  selector:
+    matchLabels:
+      app: django-api
+  template:
+    metadata:
+      labels:
+        app: django-api
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: busybox
+        command: ['sh', '-c', 'until nc -z postgres-svc {{ .Values.postgres.port }}; do echo waiting for postgres; sleep 2; done']
+      containers:
+      - name: django-api
+        image: "{{ .Values.django.image.repository }}:{{ .Values.django.image.tag }}"
+        imagePullPolicy: {{ .Values.django.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.django.port }}
+        env:
+        - name: DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.name }}
+              key: db-name
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.name }}
+              key: db-user
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.name }}
+              key: db-password
+        - name: DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.name }}
+              key: db-host
+        - name: DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.secrets.name }}
+              key: db-port
+        resources:
+          {{- toYaml .Values.django.resources | nindent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-api-svc
+  namespace: {{ .Values.namespace }}
+spec:
+  selector:
+    app: django-api
+  ports:
+  - port: 80
+    targetPort: {{ .Values.django.port }}
+  type: ClusterIP

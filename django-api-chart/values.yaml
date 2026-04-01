@@ -1,0 +1,34 @@
+namespace: django-api
+
+django:
+  image:
+    repository: ghcr.io/mungaivic/django-k8s-api
+    tag: "v1.0.1"
+    pullPolicy: IfNotPresent
+  replicas: 2
+  port: 8000
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+
+postgres:
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 5432
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "300m"
+      memory: "256Mi"
+
+secrets:
+  name: django-secrets
