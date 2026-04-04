@@ -49,6 +49,8 @@ spec:
             secretKeyRef:
               name: {{ .Values.secrets.name }}
               key: db-port
+        - name: LOGSTASH_HOST
+          value: "172.16.86.128"
         resources:
           {{- toYaml .Values.django.resources | nindent 10 }}
 ---
