@@ -20,7 +20,7 @@ postgres:
     repository: postgres
     tag: "15-alpine"
     pullPolicy: IfNotPresent
-  replicas: 1
+  replicas: 2
   port: 5432
   resources:
     requests:
